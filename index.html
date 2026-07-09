@@ -254,6 +254,7 @@
                 <li><a href="#herramientas">Herramientas</a></li>
                 <li><a href="#redes">Redes de apoyo</a></li>
                 <li><a href="#centros">Centros de ayuda</a></li>
+                <li><a href="#chat">Chat IA</a></li>
             </ul>
         </div>
     </nav>
@@ -425,7 +426,58 @@
             </div>
         </section>
 
-        <!-- SECCIÓN 7: CIERRE -->
+        <!-- ===== SECCIÓN 7: CHAT DE APOYO EMOCIONAL ===== -->
+        <section id="chat" class="section" style="background: linear-gradient(145deg, #f8faff, #eef3fa);">
+            <h2>💬 Chat de Apoyo Emocional con IA</h2>
+            <p style="margin-bottom: 20px;">Haz una pregunta sobre bienestar emocional, ansiedad, depresión o cómo ayudar a un amigo. La IA te dará información basada en fuentes confiables.</p>
+
+            <div id="chat-box" style="
+                background: white;
+                border-radius: 15px;
+                padding: 20px;
+                height: 350px;
+                overflow-y: auto;
+                border: 1px solid #dce3ed;
+                margin-bottom: 15px;
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+            ">
+                <!-- Los mensajes se agregarán aquí con JavaScript -->
+                <div style="text-align: center; color: #8899aa; padding: 20px; align-self: center;">
+                    🤖 Haz tu primera pregunta sobre bienestar emocional.
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <input type="text" id="chat-input" placeholder="Escribe tu pregunta aquí..." style="
+                    flex: 1;
+                    padding: 14px 20px;
+                    border: 2px solid #dce3ed;
+                    border-radius: 30px;
+                    font-size: 1rem;
+                    outline: none;
+                    transition: border-color 0.3s;
+                    min-width: 200px;
+                ">
+                <button id="send-btn" class="btn" style="padding: 12px 30px;">Enviar</button>
+                <button id="clear-btn" style="
+                    background: #e8edf5;
+                    border: none;
+                    padding: 12px 20px;
+                    border-radius: 30px;
+                    cursor: pointer;
+                    font-weight: 600;
+                    color: #1a2a3a;
+                    transition: 0.3s;
+                ">Limpiar chat</button>
+            </div>
+            <div style="margin-top: 15px; font-size: 0.85rem; color: #667788; text-align: center;">
+                ⚡ La IA está configurada para dar respuestas basadas en salud mental y bienestar juvenil.
+            </div>
+        </section>
+
+        <!-- SECCIÓN 8: CIERRE -->
         <section class="section" style="background: linear-gradient(135deg, #f0f4ff, #e8f0fe);">
             <h2 style="border-left-color: #6a11cb;">💖 Tu bienestar importa</h2>
             <p style="font-size: 1.1rem;">Cuidar tu salud emocional no es un lujo, es una necesidad. <strong>Pedir ayuda es un acto de valentía, no de debilidad.</strong> Recuerda: no estás solo/a, y siempre hay alguien dispuesto a escucharte.</p>
@@ -449,6 +501,189 @@
             </p>
         </div>
     </footer>
+
+    <!-- ===== JAVASCRIPT PARA EL CHAT ===== -->
+    <script>
+        // ===== CONFIGURACIÓN DEL CHAT =====
+        // Esta es la URL de tu API. Reemplaza "What+is+the+weather+like+today?" con tu pregunta dinámica.
+        const API_URL = 'https://api.delirius.store/ia/gemini?query=';
+
+        // Contexto que le damos a la IA para que se enfoque en bienestar emocional
+        const IA_CONTEXT = `Eres un asistente experto en salud mental y bienestar emocional para adolescentes y jóvenes. 
+        Tu misión es proporcionar información clara, empática y basada en evidencia sobre temas como ansiedad, depresión, 
+        autoestima, relaciones, manejo del estrés, y cómo buscar ayuda. Siempre das respuestas breves, de máximo 3 párrafos, 
+        y usas un lenguaje cálido y alentador. Si no sabes algo, lo dices y recomiendas acudir a un profesional.`;
+
+        // Elementos del DOM
+        const chatBox = document.getElementById('chat-box');
+        const chatInput = document.getElementById('chat-input');
+        const sendBtn = document.getElementById('send-btn');
+        const clearBtn = document.getElementById('clear-btn');
+
+        // ===== FUNCIONES PRINCIPALES =====
+
+        // 1. Agregar un mensaje al chat (si es del usuario o de la IA)
+        function addMessage(text, sender) {
+            // Elimina el mensaje de bienvenida si existe
+            const welcomeMsg = chatBox.querySelector('div[style*="text-align: center; color: #8899aa;"]');
+            if (welcomeMsg) welcomeMsg.remove();
+
+            const messageDiv = document.createElement('div');
+            messageDiv.style.cssText = `
+                max-width: 80%;
+                padding: 12px 18px;
+                border-radius: 18px;
+                margin-bottom: 5px;
+                word-wrap: break-word;
+                line-height: 1.4;
+                align-self: ${sender === 'user' ? 'flex-end' : 'flex-start'};
+                background: ${sender === 'user' ? '#2575fc' : '#f0f4f8'};
+                color: ${sender === 'user' ? 'white' : '#1a2a3a'};
+                border-bottom-${sender === 'user' ? 'right' : 'left'}-radius: 5px;
+            `;
+            // Reemplaza saltos de línea por <br> para mejor formato
+            messageDiv.innerHTML = text.replace(/\n/g, '<br>');
+            chatBox.appendChild(messageDiv);
+            // Auto-scroll al final
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        // 2. Mostrar un indicador de "escribiendo..."
+        function showTyping() {
+            const typingDiv = document.createElement('div');
+            typingDiv.id = 'typing-indicator';
+            typingDiv.style.cssText = `
+                align-self: flex-start;
+                background: #f0f4f8;
+                padding: 12px 18px;
+                border-radius: 18px;
+                border-bottom-left-radius: 5px;
+                color: #667788;
+                font-style: italic;
+            `;
+            typingDiv.textContent = '🤖 Escribiendo...';
+            chatBox.appendChild(typingDiv);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        // 3. Eliminar el indicador de "escribiendo..."
+        function removeTyping() {
+            const typing = document.getElementById('typing-indicator');
+            if (typing) typing.remove();
+        }
+
+        // 4. Obtener respuesta de la IA (con manejo de errores y Plan B)
+        async function getAIResponse(userQuestion) {
+            // Construimos la pregunta completa con el contexto
+            const fullQuery = `${IA_CONTEXT} Ahora, responde a esta pregunta de un adolescente: ${userQuestion}`;
+            // Codificamos para URL
+            const encodedQuery = encodeURIComponent(fullQuery);
+            const url = API_URL + encodedQuery;
+
+            try {
+                const response = await fetch(url);
+                
+                // Verificamos si la respuesta es exitosa
+                if (!response.ok) {
+                    throw new Error(`Error HTTP: ${response.status}`);
+                }
+
+                const data = await response.json();
+                console.log('Respuesta de la API:', data); // Para depuración
+
+                // Intentamos extraer el texto de la respuesta
+                let aiText = data.response || data.result || data.answer || data.text;
+                
+                // Si no encuentra nada, asume que la respuesta es el objeto completo en texto
+                if (!aiText) {
+                    aiText = JSON.stringify(data);
+                }
+
+                return aiText;
+
+            } catch (error) {
+                console.error('Error al llamar a la API:', error);
+                // === PLAN B: Respuestas simuladas si la API falla ===
+                return getSimulatedResponse(userQuestion);
+            }
+        }
+
+        // 4b. (PLAN B) Respuestas simuladas si la API no funciona
+        function getSimulatedResponse(userQuestion) {
+            const lowerQuestion = userQuestion.toLowerCase();
+            let response = "";
+
+            if (lowerQuestion.includes("ansiedad") || lowerQuestion.includes("nervios") || lowerQuestion.includes("miedo")) {
+                response = "😰 La ansiedad es una respuesta natural al estrés, pero cuando es constante puede afectar tu día a día. Te recomiendo practicar respiraciones profundas (inhala 4 seg, retén 4, exhala 6) y hablar con un adulto de confianza. Si persiste, buscar ayuda profesional es lo mejor.";
+            } else if (lowerQuestion.includes("depresión") || lowerQuestion.includes("triste") || lowerQuestion.includes("tristeza") || lowerQuestion.includes("vacío")) {
+                response = "😔 Sentir tristeza profunda y perder el interés en las cosas que antes disfrutabas puede ser señal de depresión. No estás solo/a. Habla con tus padres, un profesor o llama a una línea de ayuda. El primer paso para sentirse mejor es pedir apoyo.";
+            } else if (lowerQuestion.includes("amigo") || lowerQuestion.includes("amiga") || lowerQuestion.includes("ayudar") || lowerQuestion.includes("apoyar")) {
+                response = "🤝 Si un amigo está pasando por un mal momento, lo más importante es escuchar sin juzgar. Pregúntale cómo se siente, valida sus emociones y ofrécele compañía. Si ves que está en peligro, no dudes en buscar ayuda de un adulto o profesional.";
+            } else if (lowerQuestion.includes("autoestima") || lowerQuestion.includes("confianza") || lowerQuestion.includes("valgo")) {
+                response = "🌟 La autoestima se construye día a día. Trata de hablarte como lo harías con un buen amigo, celebra tus logros (por pequeños que sean) y rodéate de personas que te valoren. Recuerda: tu valor no depende de la aprobación de los demás.";
+            } else if (lowerQuestion.includes("estrés") || lowerQuestion.includes("presión") || lowerQuestion.includes("exámenes")) {
+                response = "📚 El estrés académico es muy común. Organiza tu tiempo, toma descansos cada 45 minutos, haz ejercicio y duerme bien. Recuerda que tu salud mental es más importante que cualquier calificación. Si la presión es mucha, habla con tus profesores o familiares.";
+            } else if (lowerQuestion.includes("sueño") || lowerQuestion.includes("dormir") || lowerQuestion.includes("insomnio")) {
+                response = "😴 Dormir bien es fundamental para tu bienestar. Intenta tener un horario fijo, evita las pantallas una hora antes de acostarte y crea un ambiente tranquilo en tu habitación. Si el insomnio persiste, consulta a un profesional.";
+            } else {
+                response = `💬 Gracias por tu pregunta. El bienestar emocional es un tema muy amplio. Te sugiero que explores las secciones de esta página sobre herramientas, redes de apoyo y señales de alerta. Si necesitas hablar con alguien, no dudes en buscar a un profesional. ¿Quieres que profundice en algún aspecto específico?`;
+            }
+
+            return response;
+        }
+
+        // 5. Manejar el envío de una pregunta
+        async function handleSend() {
+            const question = chatInput.value.trim();
+            if (!question) {
+                alert('Por favor, escribe una pregunta.');
+                return;
+            }
+
+            // Mostrar pregunta del usuario
+            addMessage(question, 'user');
+            chatInput.value = '';
+            chatInput.focus();
+
+            // Mostrar "escribiendo..."
+            showTyping();
+
+            // Obtener respuesta de la IA
+            const aiResponse = await getAIResponse(question);
+
+            // Quitar "escribiendo..." y mostrar respuesta
+            removeTyping();
+            addMessage(aiResponse, 'ai');
+        }
+
+        // ===== EVENTOS =====
+
+        // Botón "Enviar"
+        sendBtn.addEventListener('click', handleSend);
+
+        // Tecla "Enter" en el campo de texto
+        chatInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                handleSend();
+            }
+        });
+
+        // Botón "Limpiar chat"
+        clearBtn.addEventListener('click', () => {
+            chatBox.innerHTML = `
+                <div style="text-align: center; color: #8899aa; padding: 20px; align-self: center;">
+                    🤖 Haz tu primera pregunta sobre bienestar emocional.
+                </div>
+            `;
+            chatInput.value = '';
+        });
+
+        // (Opcional) Enfocar el input al cargar la página
+        window.addEventListener('load', () => {
+            chatInput.focus();
+        });
+    </script>
 
 </body>
 </html>
