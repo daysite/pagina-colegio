@@ -505,10 +505,8 @@
     <!-- ===== JAVASCRIPT PARA EL CHAT ===== -->
     <script>
         // ===== CONFIGURACIÓN DEL CHAT =====
-        // Esta es la URL de tu API. Reemplaza "What+is+the+weather+like+today?" con tu pregunta dinámica.
         const API_URL = 'https://api.delirius.store/ia/gemini?query=';
 
-        // Contexto que le damos a la IA para que se enfoque en bienestar emocional
         const IA_CONTEXT = `Eres un asistente experto en salud mental y bienestar emocional para adolescentes y jóvenes. 
         Tu misión es proporcionar información clara, empática y basada en evidencia sobre temas como ansiedad, depresión, 
         autoestima, relaciones, manejo del estrés, y cómo buscar ayuda. Siempre das respuestas breves, de máximo 3 párrafos, 
@@ -520,11 +518,42 @@
         const sendBtn = document.getElementById('send-btn');
         const clearBtn = document.getElementById('clear-btn');
 
-        // ===== FUNCIONES PRINCIPALES =====
+        // ===== FUNCIÓN PARA LIMPIAR LA RESPUESTA =====
+        function cleanAIResponse(text) {
+            // 1. Intenta extraer de un posible JSON
+            try {
+                const parsed = JSON.parse(text);
+                if (parsed && parsed.data && parsed.data.result) {
+                    return parsed.data.result;
+                }
+                if (parsed && parsed.result) return parsed.result;
+                if (parsed && parsed.response) return parsed.response;
+                if (parsed && parsed.answer) return parsed.answer;
+            } catch (e) {
+                // No es JSON, seguimos con el texto plano
+            }
 
-        // 1. Agregar un mensaje al chat (si es del usuario o de la IA)
+            // 2. Filtra líneas con metadatos no deseados
+            const lines = text.split('\n');
+            const filteredLines = lines.filter(line => {
+                const lowerLine = line.toLowerCase();
+                return !lowerLine.includes('creator') && 
+                       !lowerLine.includes('delirius') && 
+                       !lowerLine.includes('status') &&
+                       !lowerLine.includes('"true"') &&
+                       !lowerLine.includes('"false"') &&
+                       !lowerLine.includes('data.result') &&
+                       !lowerLine.includes('"result"');
+            });
+            
+            const cleaned = filteredLines.join('\n').trim();
+            
+            // 3. Si después de filtrar queda vacío, devuelve un mensaje por defecto
+            return cleaned || 'Lo siento, no pude procesar la respuesta. Por favor, intenta de nuevo.';
+        }
+
+        // ===== FUNCIONES PRINCIPALES =====
         function addMessage(text, sender) {
-            // Elimina el mensaje de bienvenida si existe
             const welcomeMsg = chatBox.querySelector('div[style*="text-align: center; color: #8899aa;"]');
             if (welcomeMsg) welcomeMsg.remove();
 
@@ -541,14 +570,11 @@
                 color: ${sender === 'user' ? 'white' : '#1a2a3a'};
                 border-bottom-${sender === 'user' ? 'right' : 'left'}-radius: 5px;
             `;
-            // Reemplaza saltos de línea por <br> para mejor formato
             messageDiv.innerHTML = text.replace(/\n/g, '<br>');
             chatBox.appendChild(messageDiv);
-            // Auto-scroll al final
             chatBox.scrollTop = chatBox.scrollHeight;
         }
 
-        // 2. Mostrar un indicador de "escribiendo..."
         function showTyping() {
             const typingDiv = document.createElement('div');
             typingDiv.id = 'typing-indicator';
@@ -566,51 +592,87 @@
             chatBox.scrollTop = chatBox.scrollHeight;
         }
 
-        // 3. Eliminar el indicador de "escribiendo..."
         function removeTyping() {
             const typing = document.getElementById('typing-indicator');
             if (typing) typing.remove();
         }
 
-        // 4. Obtener respuesta de la IA (con manejo de errores y Plan B)
+        // ===== DETECTAR PREGUNTA SOBRE EL CREADOR =====
+        function detectCreatorQuestion(question) {
+            const lowerQ = question.toLowerCase();
+            const keywords = ['creador', 'creadora', 'quien te creó', 'quién te creó', 'quien te hizo', 'quién te hizo', 'quien es tu creador', 'quién es tu creador', 'quien te programó', 'quién te programó', 'daniel'];
+            
+            for (let keyword of keywords) {
+                if (lowerQ.includes(keyword)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        // ===== OBTENER RESPUESTA DE LA IA (con limpieza) =====
         async function getAIResponse(userQuestion) {
-            // Construimos la pregunta completa con el contexto
+            // Verificar si pregunta por el creador
+            if (detectCreatorQuestion(userQuestion)) {
+                return "👨‍💻 ¡Hola! Mi creador es **Daniel**, un estudiante apasionado por la tecnología y el bienestar emocional. Él diseñó este chat para ayudar a adolescentes y jóvenes a encontrar información y apoyo sobre su salud mental. ¡Espero que mi ayuda te sea útil! 💙";
+            }
+
             const fullQuery = `${IA_CONTEXT} Ahora, responde a esta pregunta de un adolescente: ${userQuestion}`;
-            // Codificamos para URL
             const encodedQuery = encodeURIComponent(fullQuery);
             const url = API_URL + encodedQuery;
 
             try {
                 const response = await fetch(url);
                 
-                // Verificamos si la respuesta es exitosa
                 if (!response.ok) {
                     throw new Error(`Error HTTP: ${response.status}`);
                 }
 
                 const data = await response.json();
-                console.log('Respuesta de la API:', data); // Para depuración
+                console.log('Respuesta completa de la API:', data);
 
-                // Intentamos extraer el texto de la respuesta
-                let aiText = data.response || data.result || data.answer || data.text;
-                
-                // Si no encuentra nada, asume que la respuesta es el objeto completo en texto
+                // Extraer el texto de la respuesta
+                let aiText = null;
+                if (data && data.data && data.data.result) {
+                    aiText = data.data.result;
+                } else if (data && data.result) {
+                    aiText = data.result;
+                } else if (data && data.response) {
+                    aiText = data.response;
+                } else if (data && data.answer) {
+                    aiText = data.answer;
+                } else if (data && data.text) {
+                    aiText = data.text;
+                } else if (data && data.candidates && data.candidates.length > 0) {
+                    const candidate = data.candidates[0];
+                    if (candidate.content && candidate.content.parts && candidate.content.parts.length > 0) {
+                        aiText = candidate.content.parts[0].text;
+                    }
+                }
+
+                // Si no se encontró texto, convertir a string
                 if (!aiText) {
                     aiText = JSON.stringify(data);
                 }
 
-                return aiText;
+                // Limpiar la respuesta de metadatos
+                return cleanAIResponse(aiText);
 
             } catch (error) {
                 console.error('Error al llamar a la API:', error);
-                // === PLAN B: Respuestas simuladas si la API falla ===
                 return getSimulatedResponse(userQuestion);
             }
         }
 
-        // 4b. (PLAN B) Respuestas simuladas si la API no funciona
+        // ===== PLAN B: RESPUESTAS SIMULADAS =====
         function getSimulatedResponse(userQuestion) {
             const lowerQuestion = userQuestion.toLowerCase();
+            
+            // Verificar si pregunta por el creador (también en el Plan B)
+            if (detectCreatorQuestion(userQuestion)) {
+                return "👨‍💻 ¡Hola! Mi creador es **Daniel**, un estudiante apasionado por la tecnología y el bienestar emocional. Él diseñó este chat para ayudar a adolescentes y jóvenes a encontrar información y apoyo sobre su salud mental. ¡Espero que mi ayuda te sea útil! 💙";
+            }
+
             let response = "";
 
             if (lowerQuestion.includes("ansiedad") || lowerQuestion.includes("nervios") || lowerQuestion.includes("miedo")) {
@@ -632,7 +694,7 @@
             return response;
         }
 
-        // 5. Manejar el envío de una pregunta
+        // ===== MANEJAR EL ENVÍO =====
         async function handleSend() {
             const question = chatInput.value.trim();
             if (!question) {
@@ -640,28 +702,21 @@
                 return;
             }
 
-            // Mostrar pregunta del usuario
             addMessage(question, 'user');
             chatInput.value = '';
             chatInput.focus();
 
-            // Mostrar "escribiendo..."
             showTyping();
 
-            // Obtener respuesta de la IA
             const aiResponse = await getAIResponse(question);
+            const cleanedResponse = cleanAIResponse(aiResponse); // Doble limpieza por seguridad
 
-            // Quitar "escribiendo..." y mostrar respuesta
             removeTyping();
-            addMessage(aiResponse, 'ai');
+            addMessage(cleanedResponse, 'ai');
         }
 
         // ===== EVENTOS =====
-
-        // Botón "Enviar"
         sendBtn.addEventListener('click', handleSend);
-
-        // Tecla "Enter" en el campo de texto
         chatInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
                 e.preventDefault();
@@ -669,7 +724,6 @@
             }
         });
 
-        // Botón "Limpiar chat"
         clearBtn.addEventListener('click', () => {
             chatBox.innerHTML = `
                 <div style="text-align: center; color: #8899aa; padding: 20px; align-self: center;">
@@ -679,7 +733,6 @@
             chatInput.value = '';
         });
 
-        // (Opcional) Enfocar el input al cargar la página
         window.addEventListener('load', () => {
             chatInput.focus();
         });
