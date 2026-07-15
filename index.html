@@ -164,6 +164,51 @@
             font-weight: 600;
         }
 
+        /* ===== REPRODUCTOR DE MÚSICA ===== */
+        .music-player {
+            position: fixed;
+            bottom: 90px;
+            right: 25px;
+            z-index: 999;
+            background: var(--bg-card);
+            border-radius: 50px;
+            padding: 10px 18px;
+            border: 2px solid var(--border-color);
+            box-shadow: 0 4px 15px var(--shadow-color);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: var(--transition);
+        }
+
+        .music-player button {
+            background: none;
+            border: none;
+            font-size: 1.8rem;
+            cursor: pointer;
+            color: var(--text-primary);
+            transition: var(--transition);
+            padding: 5px;
+        }
+
+        .music-player button:hover {
+            transform: scale(1.1);
+        }
+
+        .music-player input[type="range"] {
+            width: 80px;
+            accent-color: var(--gradient-end);
+            background: transparent;
+            cursor: pointer;
+        }
+
+        .music-player .volume-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            min-width: 35px;
+            text-align: center;
+        }
+
         /* ===== BARRA DE NAVEGACIÓN ===== */
         nav {
             background: var(--bg-nav);
@@ -687,10 +732,34 @@
             .theme-toggle .label {
                 display: none;
             }
+
+            .music-player {
+                bottom: 75px;
+                right: 15px;
+                padding: 8px 14px;
+                gap: 8px;
+            }
+
+            .music-player input[type="range"] {
+                width: 60px;
+            }
+
+            .music-player button {
+                font-size: 1.4rem;
+            }
         }
     </style>
 </head>
 <body>
+
+    <!-- ===== REPRODUCTOR DE MÚSICA (Opción 1) ===== -->
+    <div class="music-player" id="musicPlayer">
+        <button id="musicToggle" aria-label="Reproducir/Pausar música">
+            🔊
+        </button>
+        <input type="range" id="volumeControl" min="0" max="1" step="0.05" value="0.3">
+        <span class="volume-label" id="volumeLabel">30%</span>
+    </div>
 
     <!-- ===== BOTÓN MODO OSCURO/CLARO ===== -->
     <button class="theme-toggle" id="themeToggle" aria-label="Cambiar tema">
@@ -955,8 +1024,80 @@
         </div>
     </footer>
 
-    <!-- ===== JAVASCRIPT PARA EL TEST, CHAT Y MODO OSCURO ===== -->
+    <!-- ===== JAVASCRIPT PARA EL TEST, CHAT, MÚSICA Y MODO OSCURO ===== -->
     <script>
+        // ============================================================
+        // ===== MÚSICA DE FONDO (Opción 1) =====
+        // ============================================================
+
+        // Reemplaza esta URL con tu propio archivo de audio si lo deseas
+        const MUSIC_URL = 'https://cdn.pixabay.com/download/audio/2022/03/10/audio_c8c8a7c6b8.mp3?filename=relaxing-piano-10753.mp3';
+        
+        let audio = null;
+        let isMusicPlaying = false;
+        const musicToggle = document.getElementById('musicToggle');
+        const volumeControl = document.getElementById('volumeControl');
+        const volumeLabel = document.getElementById('volumeLabel');
+
+        // Crear el elemento de audio
+        function createAudio() {
+            if (!audio) {
+                audio = new Audio(MUSIC_URL);
+                audio.loop = true;
+                audio.volume = parseFloat(volumeControl.value);
+                audio.preload = 'auto';
+            }
+            return audio;
+        }
+
+        // Alternar reproducción
+        function toggleMusic() {
+            const audioElement = createAudio();
+            
+            if (isMusicPlaying) {
+                audioElement.pause();
+                musicToggle.textContent = '🔇';
+                isMusicPlaying = false;
+            } else {
+                // Intentar reproducir (puede ser bloqueado por el navegador)
+                const playPromise = audioElement.play();
+                
+                if (playPromise !== undefined) {
+                    playPromise.then(() => {
+                        musicToggle.textContent = '🔊';
+                        isMusicPlaying = true;
+                    }).catch(error => {
+                        console.log('Reproducción automática bloqueada:', error);
+                        // Mostrar mensaje amigable
+                        alert('🎵 Para escuchar música, haz clic en "Reproducir" después de interactuar con la página.');
+                        musicToggle.textContent = '🔇';
+                        isMusicPlaying = false;
+                    });
+                }
+            }
+        }
+
+        // Control de volumen
+        volumeControl.addEventListener('input', function() {
+            const vol = parseFloat(this.value);
+            if (audio) {
+                audio.volume = vol;
+            }
+            volumeLabel.textContent = Math.round(vol * 100) + '%';
+        });
+
+        // Evento para el botón de música
+        musicToggle.addEventListener('click', toggleMusic);
+
+        // Intentar reproducir al hacer clic en cualquier parte (por si el navegador bloquea)
+        document.addEventListener('click', function firstInteraction() {
+            if (!isMusicPlaying && audio) {
+                audio.play().catch(() => {});
+            }
+            // Remover el listener después del primer clic
+            document.removeEventListener('click', firstInteraction);
+        }, { once: true });
+
         // ============================================================
         // ===== MODO OSCURO / CLARO =====
         // ============================================================
