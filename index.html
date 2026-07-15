@@ -197,6 +197,200 @@
             box-shadow: 0 8px 25px rgba(37, 117, 252, 0.3);
         }
 
+        .btn-secondary {
+            background: #e8edf5;
+            color: #1a2a3a;
+        }
+
+        .btn-secondary:hover {
+            background: #d5dce8;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+
+        /* ===== TEST DE BIENESTAR ===== */
+        .test-container {
+            background: #f8faff;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 20px 0;
+            border: 1px solid #e8edf5;
+        }
+
+        .test-progress {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .test-progress-bar {
+            flex: 1;
+            height: 8px;
+            background: #e8edf5;
+            border-radius: 10px;
+            min-width: 100px;
+        }
+
+        .test-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #6a11cb, #2575fc);
+            border-radius: 10px;
+            transition: width 0.5s ease;
+            width: 0%;
+        }
+
+        .test-step-indicator {
+            font-weight: 600;
+            color: #2575fc;
+            white-space: nowrap;
+        }
+
+        .test-question {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #1a2a3a;
+        }
+
+        .test-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .test-option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 18px;
+            background: white;
+            border: 2px solid #e8edf5;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .test-option:hover {
+            border-color: #2575fc;
+            background: #f0f7ff;
+        }
+
+        .test-option.selected {
+            border-color: #2575fc;
+            background: #e8f4fd;
+        }
+
+        .test-option input[type="radio"] {
+            accent-color: #2575fc;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .test-option label {
+            cursor: pointer;
+            flex: 1;
+            font-size: 1rem;
+        }
+
+        .test-nav {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        .test-result {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .test-result .emoji-big {
+            font-size: 4rem;
+            margin-bottom: 10px;
+        }
+
+        .test-result h3 {
+            color: #2575fc;
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+
+        .test-result p {
+            font-size: 1.1rem;
+            max-width: 500px;
+            margin: 0 auto 15px;
+        }
+
+        .test-result .score-box {
+            display: inline-block;
+            background: linear-gradient(135deg, #6a11cb, #2575fc);
+            color: white;
+            padding: 10px 30px;
+            border-radius: 30px;
+            font-weight: 700;
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+        }
+
+        /* ===== BOTONES COMPARTIR/COPIAR ===== */
+        .share-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .share-btn {
+            padding: 8px 20px;
+            border-radius: 20px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .share-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .share-btn.copy {
+            background: #e8edf5;
+            color: #1a2a3a;
+        }
+
+        .share-btn.copy:hover {
+            background: #d5dce8;
+        }
+
+        .share-btn.whatsapp {
+            background: #25D366;
+            color: white;
+        }
+
+        .share-btn.whatsapp:hover {
+            background: #1da851;
+        }
+
+        .share-btn.twitter {
+            background: #1DA1F2;
+            color: white;
+        }
+
+        .share-btn.twitter:hover {
+            background: #1a8cd8;
+        }
+
         /* ===== PIE DE PÁGINA ===== */
         footer {
             background: #1a2a3a;
@@ -231,6 +425,14 @@
             .section {
                 padding: 25px 18px;
             }
+
+            .test-container {
+                padding: 20px;
+            }
+
+            .test-question {
+                font-size: 1rem;
+            }
         }
     </style>
 </head>
@@ -254,6 +456,7 @@
                 <li><a href="#herramientas">Herramientas</a></li>
                 <li><a href="#redes">Redes de apoyo</a></li>
                 <li><a href="#centros">Centros de ayuda</a></li>
+                <li><a href="#test">Test de bienestar</a></li>
                 <li><a href="#chat">Chat IA</a></li>
             </ul>
         </div>
@@ -426,7 +629,27 @@
             </div>
         </section>
 
-        <!-- ===== SECCIÓN 7: CHAT DE APOYO EMOCIONAL ===== -->
+        <!-- ===== SECCIÓN 7: TEST DE BIENESTAR EMOCIONAL ===== -->
+        <section id="test" class="section" style="background: linear-gradient(145deg, #f8faff, #eef3fa);">
+            <h2>📋 Test de Bienestar Emocional</h2>
+            <p>Responde estas 5 preguntas para conocer cómo está tu salud emocional. <strong>No es un diagnóstico</strong>, solo una guía para que reflexiones sobre cómo te sientes.</p>
+
+            <div class="test-container" id="test-container">
+                <!-- El test se generará con JavaScript -->
+                <div id="test-content"></div>
+            </div>
+
+            <!-- Botones para compartir resultados -->
+            <div style="text-align: center; margin-top: 15px;">
+                <div class="share-buttons">
+                    <button class="share-btn copy" onclick="copyResults()">📋 Copiar resultados</button>
+                    <button class="share-btn whatsapp" onclick="shareWhatsApp()">💬 Compartir por WhatsApp</button>
+                    <button class="share-btn twitter" onclick="shareTwitter()">🐦 Compartir en Twitter</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== SECCIÓN 8: CHAT DE APOYO EMOCIONAL ===== -->
         <section id="chat" class="section" style="background: linear-gradient(145deg, #f8faff, #eef3fa);">
             <h2>💬 Chat de Apoyo Emocional con IA</h2>
             <p style="margin-bottom: 20px;">Haz una pregunta sobre bienestar emocional, ansiedad, depresión o cómo ayudar a un amigo. La IA te dará información basada en fuentes confiables.</p>
@@ -443,7 +666,6 @@
                 flex-direction: column;
                 gap: 10px;
             ">
-                <!-- Los mensajes se agregarán aquí con JavaScript -->
                 <div style="text-align: center; color: #8899aa; padding: 20px; align-self: center;">
                     🤖 Haz tu primera pregunta sobre bienestar emocional.
                 </div>
@@ -477,7 +699,7 @@
             </div>
         </section>
 
-        <!-- SECCIÓN 8: CIERRE -->
+        <!-- SECCIÓN 9: CIERRE -->
         <section class="section" style="background: linear-gradient(135deg, #f0f4ff, #e8f0fe);">
             <h2 style="border-left-color: #6a11cb;">💖 Tu bienestar importa</h2>
             <p style="font-size: 1.1rem;">Cuidar tu salud emocional no es un lujo, es una necesidad. <strong>Pedir ayuda es un acto de valentía, no de debilidad.</strong> Recuerda: no estás solo/a, y siempre hay alguien dispuesto a escucharte.</p>
@@ -502,9 +724,231 @@
         </div>
     </footer>
 
-    <!-- ===== JAVASCRIPT PARA EL CHAT ===== -->
+    <!-- ===== JAVASCRIPT PARA EL TEST Y EL CHAT ===== -->
     <script>
-        // ===== CONFIGURACIÓN DEL CHAT =====
+        // ============================================================
+        // ===== TEST DE BIENESTAR EMOCIONAL =====
+        // ============================================================
+
+        const testQuestions = [
+            {
+                question: "¿Qué tal has dormido esta semana?",
+                options: [
+                    "😴 Muy bien, he descansado suficiente",
+                    "😐 Regular, he tenido algunas noches malas",
+                    "😰 Mal, he dormido poco y con interrupciones",
+                    "🚫 Muy mal, casi no he podido dormir"
+                ],
+                scores: [4, 3, 2, 1]
+            },
+            {
+                question: "¿Cómo te has sentido con tus amigos y familiares?",
+                options: [
+                    "🥰 Muy bien, me siento apoyado/a",
+                    "😊 Bien, aunque me gustaría conectar más",
+                    "😕 Regular, a veces me siento incomprendido/a",
+                    "😔 Mal, me siento solo/a o aislado/a"
+                ],
+                scores: [4, 3, 2, 1]
+            },
+            {
+                question: "¿Con qué frecuencia has sentido ansiedad o preocupación?",
+                options: [
+                    "🧘 Casi nada, me siento tranquilo/a",
+                    "😌 A veces, pero lo manejo bien",
+                    "😰 Frecuentemente, me cuesta controlarlo",
+                    "😱 Todo el tiempo, me siento abrumado/a"
+                ],
+                scores: [4, 3, 2, 1]
+            },
+            {
+                question: "¿Cómo ha sido tu estado de ánimo general?",
+                options: [
+                    "😄 Feliz y con energía la mayor parte del tiempo",
+                    "🙂 Normal, con altibajos leves",
+                    "😞 Triste o irritable con frecuencia",
+                    "😭 Muy triste o desesperanzado/a"
+                ],
+                scores: [4, 3, 2, 1]
+            },
+            {
+                question: "¿Has podido concentrarte en tus actividades diarias?",
+                options: [
+                    "🎯 Sí, sin problemas",
+                    "📚 A veces me distraigo, pero logro avanzar",
+                    "🤔 Me cuesta mucho concentrarme",
+                    "🚫 No puedo concentrarme en nada"
+                ],
+                scores: [4, 3, 2, 1]
+            }
+        ];
+
+        let currentStep = 0;
+        let answers = [];
+        let testCompleted = false;
+
+        function renderTest() {
+            const container = document.getElementById('test-content');
+            
+            if (testCompleted) {
+                // Mostrar resultados
+                const totalScore = answers.reduce((a, b) => a + b, 0);
+                const maxScore = testQuestions.length * 4;
+                const percentage = Math.round((totalScore / maxScore) * 100);
+                
+                let emoji, level, recommendation, color;
+                if (percentage >= 80) {
+                    emoji = "🌟";
+                    level = "Excelente bienestar emocional";
+                    recommendation = "¡Sigue así! Tus hábitos y redes de apoyo están funcionando muy bien. Mantén el equilibrio y no dudes en ayudar a otros que puedan necesitarlo.";
+                    color = "#27ae60";
+                } else if (percentage >= 60) {
+                    emoji = "😊";
+                    level = "Buen bienestar emocional";
+                    recommendation = "Vas por buen camino, pero puedes mejorar. Intenta incorporar algunas herramientas de la sección de 'Herramientas y prácticas' y fortalecer tus redes de apoyo.";
+                    color = "#f39c12";
+                } else if (percentage >= 40) {
+                    emoji = "😐";
+                    level = "Bienestar emocional regular";
+                    recommendation = "Es momento de prestar más atención a tu salud emocional. Habla con alguien de confianza, practica mindfulness y considera buscar ayuda profesional si lo necesitas.";
+                    color = "#e67e22";
+                } else {
+                    emoji = "💙";
+                    level = "Bienestar emocional bajo";
+                    recommendation = "No estás solo/a. Es importante que busques apoyo. Habla con tus padres, un profesor, o llama a una línea de ayuda. Pedir ayuda es un acto de valentía.";
+                    color = "#e74c3c";
+                }
+
+                container.innerHTML = `
+                    <div class="test-result">
+                        <div class="emoji-big">${emoji}</div>
+                        <div class="score-box">Puntuación: ${totalScore} / ${maxScore} (${percentage}%)</div>
+                        <h3 style="color: ${color};">${level}</h3>
+                        <p>${recommendation}</p>
+                        <button class="btn" onclick="resetTest()" style="margin-top: 15px;">
+                            🔄 Volver a hacer el test
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+
+            const question = testQuestions[currentStep];
+            const progress = ((currentStep + 1) / testQuestions.length) * 100;
+
+            let optionsHTML = '';
+            question.options.forEach((option, index) => {
+                const isSelected = answers[currentStep] === question.scores[index];
+                optionsHTML += `
+                    <div class="test-option ${isSelected ? 'selected' : ''}" onclick="selectOption(${index})">
+                        <input type="radio" name="test-option" value="${question.scores[index]}" ${isSelected ? 'checked' : ''}>
+                        <label>${option}</label>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = `
+                <div class="test-progress">
+                    <span class="test-step-indicator">Paso ${currentStep + 1}/${testQuestions.length}</span>
+                    <div class="test-progress-bar">
+                        <div class="test-progress-fill" style="width: ${progress}%;"></div>
+                    </div>
+                    <span style="font-size:0.9rem; color:#667788;">${Math.round(progress)}%</span>
+                </div>
+                <div class="test-question">${question.question}</div>
+                <div class="test-options">${optionsHTML}</div>
+                <div class="test-nav">
+                    <button class="btn btn-secondary" onclick="prevStep()" ${currentStep === 0 ? 'disabled style="opacity:0.5;cursor:not-allowed;"' : ''}>
+                        ⬅ Anterior
+                    </button>
+                    <button class="btn" onclick="nextStep()">
+                        ${currentStep === testQuestions.length - 1 ? '✅ Ver resultados' : 'Siguiente ➡'}
+                    </button>
+                </div>
+            `;
+        }
+
+        function selectOption(index) {
+            const question = testQuestions[currentStep];
+            answers[currentStep] = question.scores[index];
+            renderTest();
+        }
+
+        function nextStep() {
+            if (answers[currentStep] === undefined || answers[currentStep] === null) {
+                alert('Por favor, selecciona una opción antes de continuar.');
+                return;
+            }
+
+            if (currentStep === testQuestions.length - 1) {
+                testCompleted = true;
+                renderTest();
+            } else {
+                currentStep++;
+                renderTest();
+            }
+        }
+
+        function prevStep() {
+            if (currentStep > 0) {
+                currentStep--;
+                renderTest();
+            }
+        }
+
+        function resetTest() {
+            currentStep = 0;
+            answers = [];
+            testCompleted = false;
+            renderTest();
+        }
+
+        // ===== COMPARTIR RESULTADOS =====
+        function getResultsText() {
+            const totalScore = answers.reduce((a, b) => a + b, 0);
+            const maxScore = testQuestions.length * 4;
+            const percentage = Math.round((totalScore / maxScore) * 100);
+            let level = "";
+            if (percentage >= 80) level = "🌟 Excelente bienestar emocional";
+            else if (percentage >= 60) level = "😊 Buen bienestar emocional";
+            else if (percentage >= 40) level = "😐 Bienestar emocional regular";
+            else level = "💙 Bienestar emocional bajo";
+            
+            return `🧠 Mi resultado en el Test de Bienestar Emocional: ${level} (${percentage}%) - ${totalScore}/${maxScore} puntos. ¡Cuida tu salud mental! 💙`;
+        }
+
+        function copyResults() {
+            const text = getResultsText();
+            navigator.clipboard.writeText(text).then(() => {
+                alert('✅ Resultados copiados al portapapeles');
+            }).catch(() => {
+                // Fallback
+                const textarea = document.createElement('textarea');
+                textarea.value = text;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                alert('✅ Resultados copiados al portapapeles');
+            });
+        }
+
+        function shareWhatsApp() {
+            const text = getResultsText();
+            const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
+            window.open(url, '_blank');
+        }
+
+        function shareTwitter() {
+            const text = getResultsText();
+            const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
+            window.open(url, '_blank');
+        }
+
+        // ============================================================
+        // ===== CHAT DE APOYO EMOCIONAL =====
+        // ============================================================
+
         const API_URL = 'https://api.delirius.store/ia/gemini?query=';
 
         const IA_CONTEXT = `Eres un asistente experto en salud mental y bienestar emocional para adolescentes y jóvenes. 
@@ -512,15 +956,12 @@
         autoestima, relaciones, manejo del estrés, y cómo buscar ayuda. Siempre das respuestas breves, de máximo 3 párrafos, 
         y usas un lenguaje cálido y alentador. Si no sabes algo, lo dices y recomiendas acudir a un profesional.`;
 
-        // Elementos del DOM
         const chatBox = document.getElementById('chat-box');
         const chatInput = document.getElementById('chat-input');
         const sendBtn = document.getElementById('send-btn');
         const clearBtn = document.getElementById('clear-btn');
 
-        // ===== FUNCIÓN PARA LIMPIAR LA RESPUESTA =====
         function cleanAIResponse(text) {
-            // 1. Intenta extraer de un posible JSON
             try {
                 const parsed = JSON.parse(text);
                 if (parsed && parsed.data && parsed.data.result) {
@@ -529,11 +970,8 @@
                 if (parsed && parsed.result) return parsed.result;
                 if (parsed && parsed.response) return parsed.response;
                 if (parsed && parsed.answer) return parsed.answer;
-            } catch (e) {
-                // No es JSON, seguimos con el texto plano
-            }
+            } catch (e) {}
 
-            // 2. Filtra líneas con metadatos no deseados
             const lines = text.split('\n');
             const filteredLines = lines.filter(line => {
                 const lowerLine = line.toLowerCase();
@@ -547,12 +985,9 @@
             });
             
             const cleaned = filteredLines.join('\n').trim();
-            
-            // 3. Si después de filtrar queda vacío, devuelve un mensaje por defecto
             return cleaned || 'Lo siento, no pude procesar la respuesta. Por favor, intenta de nuevo.';
         }
 
-        // ===== FUNCIONES PRINCIPALES =====
         function addMessage(text, sender) {
             const welcomeMsg = chatBox.querySelector('div[style*="text-align: center; color: #8899aa;"]');
             if (welcomeMsg) welcomeMsg.remove();
@@ -597,11 +1032,9 @@
             if (typing) typing.remove();
         }
 
-        // ===== DETECTAR PREGUNTA SOBRE EL CREADOR =====
         function detectCreatorQuestion(question) {
             const lowerQ = question.toLowerCase();
             const keywords = ['creador', 'creadora', 'quien te creó', 'quién te creó', 'quien te hizo', 'quién te hizo', 'quien es tu creador', 'quién es tu creador', 'quien te programó', 'quién te programó', 'daniel'];
-            
             for (let keyword of keywords) {
                 if (lowerQ.includes(keyword)) {
                     return true;
@@ -610,9 +1043,7 @@
             return false;
         }
 
-        // ===== OBTENER RESPUESTA DE LA IA (con limpieza) =====
         async function getAIResponse(userQuestion) {
-            // Verificar si pregunta por el creador
             if (detectCreatorQuestion(userQuestion)) {
                 return "👨‍💻 ¡Hola! Mi creador es **Daniel**, un estudiante apasionado por la tecnología y el bienestar emocional. Él diseñó este chat para ayudar a adolescentes y jóvenes a encontrar información y apoyo sobre su salud mental. ¡Espero que mi ayuda te sea útil! 💙";
             }
@@ -623,15 +1054,12 @@
 
             try {
                 const response = await fetch(url);
-                
                 if (!response.ok) {
                     throw new Error(`Error HTTP: ${response.status}`);
                 }
-
                 const data = await response.json();
                 console.log('Respuesta completa de la API:', data);
 
-                // Extraer el texto de la respuesta
                 let aiText = null;
                 if (data && data.data && data.data.result) {
                     aiText = data.data.result;
@@ -649,13 +1077,9 @@
                         aiText = candidate.content.parts[0].text;
                     }
                 }
-
-                // Si no se encontró texto, convertir a string
                 if (!aiText) {
                     aiText = JSON.stringify(data);
                 }
-
-                // Limpiar la respuesta de metadatos
                 return cleanAIResponse(aiText);
 
             } catch (error) {
@@ -664,17 +1088,14 @@
             }
         }
 
-        // ===== PLAN B: RESPUESTAS SIMULADAS =====
         function getSimulatedResponse(userQuestion) {
             const lowerQuestion = userQuestion.toLowerCase();
             
-            // Verificar si pregunta por el creador (también en el Plan B)
             if (detectCreatorQuestion(userQuestion)) {
                 return "👨‍💻 ¡Hola! Mi creador es **Daniel**, un estudiante apasionado por la tecnología y el bienestar emocional. Él diseñó este chat para ayudar a adolescentes y jóvenes a encontrar información y apoyo sobre su salud mental. ¡Espero que mi ayuda te sea útil! 💙";
             }
 
             let response = "";
-
             if (lowerQuestion.includes("ansiedad") || lowerQuestion.includes("nervios") || lowerQuestion.includes("miedo")) {
                 response = "😰 La ansiedad es una respuesta natural al estrés, pero cuando es constante puede afectar tu día a día. Te recomiendo practicar respiraciones profundas (inhala 4 seg, retén 4, exhala 6) y hablar con un adulto de confianza. Si persiste, buscar ayuda profesional es lo mejor.";
             } else if (lowerQuestion.includes("depresión") || lowerQuestion.includes("triste") || lowerQuestion.includes("tristeza") || lowerQuestion.includes("vacío")) {
@@ -690,32 +1111,25 @@
             } else {
                 response = `💬 Gracias por tu pregunta. El bienestar emocional es un tema muy amplio. Te sugiero que explores las secciones de esta página sobre herramientas, redes de apoyo y señales de alerta. Si necesitas hablar con alguien, no dudes en buscar a un profesional. ¿Quieres que profundice en algún aspecto específico?`;
             }
-
             return response;
         }
 
-        // ===== MANEJAR EL ENVÍO =====
         async function handleSend() {
             const question = chatInput.value.trim();
             if (!question) {
                 alert('Por favor, escribe una pregunta.');
                 return;
             }
-
             addMessage(question, 'user');
             chatInput.value = '';
             chatInput.focus();
-
             showTyping();
-
             const aiResponse = await getAIResponse(question);
-            const cleanedResponse = cleanAIResponse(aiResponse); // Doble limpieza por seguridad
-
+            const cleanedResponse = cleanAIResponse(aiResponse);
             removeTyping();
             addMessage(cleanedResponse, 'ai');
         }
 
-        // ===== EVENTOS =====
         sendBtn.addEventListener('click', handleSend);
         chatInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
@@ -733,7 +1147,11 @@
             chatInput.value = '';
         });
 
+        // ============================================================
+        // ===== INICIALIZAR TEST AL CARGAR LA PÁGINA =====
+        // ============================================================
         window.addEventListener('load', () => {
+            renderTest();
             chatInput.focus();
         });
     </script>
