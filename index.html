@@ -98,6 +98,12 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-8px); }
+            75% { transform: translateX(8px); }
+        }
+
         /* ===== ENCABEZADO PRINCIPAL ===== */
         .hero {
             background: linear-gradient(135deg, #6dd5ed 0%, #2193b0 100%);
@@ -167,14 +173,19 @@
             border: 3px solid #d6eef8;
         }
 
+        /* 🌟 IMAGEN GRANDE TIPO BANNER (como el boceto) */
         .welcome-emoji-img {
-            width: 110px;
-            height: 110px;
-            object-fit: contain;
-            margin: 0 auto 12px;
+            width: 100%;
+            max-width: 100%;
+            height: auto;
+            max-height: 320px;
+            object-fit: cover;
+            border-radius: 22px;
+            margin: 0 auto 20px;
             display: block;
-            animation: float 3s ease-in-out infinite;
-            filter: drop-shadow(0 6px 15px rgba(33, 147, 176, 0.3));
+            animation: float 4s ease-in-out infinite;
+            box-shadow: 0 12px 30px rgba(33, 147, 176, 0.25);
+            border: 4px solid #d6eef8;
         }
 
         .welcome-title {
@@ -700,6 +711,11 @@
             margin-bottom: 20px;
             border: 2px solid var(--border-color);
             text-align: center;
+            transition: var(--transition);
+        }
+
+        .vf-question.shake {
+            animation: shake 0.4s ease;
         }
 
         .vf-question h3 {
@@ -737,6 +753,7 @@
             background: #d4f5dd;
             border-color: #27ae60;
             color: #1e7a3f;
+            animation: pulse 0.5s ease;
         }
 
         .vf-btn.wrong {
@@ -864,9 +881,9 @@
         @media (max-width: 768px) {
             .hero-title { font-size: 2rem; }
             .hero { padding: 40px 20px 70px; }
-            .welcome-card { padding: 30px 20px 20px; margin: -50px auto 30px; }
+            .welcome-card { padding: 25px 20px 20px; margin: -50px auto 30px; }
             .welcome-title { font-size: 1.3rem; }
-            .welcome-emoji-img { width: 85px; height: 85px; }
+            .welcome-emoji-img { max-height: 220px; border-radius: 18px; }
             .menu-grid { grid-template-columns: repeat(2, 1fr); gap: 15px; padding: 0 15px; }
             .menu-btn { padding: 22px 12px; border-radius: 20px; }
             .menu-btn .icon { font-size: 2.3rem; }
@@ -880,6 +897,7 @@
         @media (max-width: 480px) {
             .hero-title { font-size: 1.6rem; }
             .hero-subtitle { font-size: 0.95rem; }
+            .welcome-emoji-img { max-height: 180px; }
             .menu-btn .label { font-size: 0.9rem; }
             .menu-btn .icon { font-size: 2rem; }
             .vf-btn { padding: 12px 25px; font-size: 0.95rem; }
@@ -1189,9 +1207,72 @@
     <!-- ===== JAVASCRIPT ===== -->
     <script>
         // ============================================================
+        // ===== SONIDOS ESTILO DUOLINGO (Web Audio API) =====
+        // ============================================================
+        let audioCtx = null;
+
+        function getAudioContext() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            return audioCtx;
+        }
+
+        // Melodía ascendente alegre para respuesta correcta
+        function playCorrectSound() {
+            try {
+                const ctx = getAudioContext();
+                const now = ctx.currentTime;
+                // Notas: Do5, Mi5, Sol5 (acorde mayor ascendente)
+                const notes = [523.25, 659.25, 783.99];
+                notes.forEach((freq, i) => {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.value = freq;
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    const start = now + i * 0.09;
+                    gain.gain.setValueAtTime(0, start);
+                    gain.gain.linearRampToValueAtTime(0.25, start + 0.02);
+                    gain.gain.exponentialRampToValueAtTime(0.001, start + 0.28);
+                    osc.start(start);
+                    osc.stop(start + 0.3);
+                });
+            } catch (e) { console.warn('Audio no disponible:', e); }
+        }
+
+        // Melodía descendente suave para respuesta incorrecta
+        function playWrongSound() {
+            try {
+                const ctx = getAudioContext();
+                const now = ctx.currentTime;
+                // Notas: Si4, Sol4 descendente (dos tonos)
+                const notes = [493.88, 392.00];
+                notes.forEach((freq, i) => {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.value = freq;
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    const start = now + i * 0.15;
+                    gain.gain.setValueAtTime(0, start);
+                    gain.gain.linearRampToValueAtTime(0.3, start + 0.03);
+                    gain.gain.exponentialRampToValueAtTime(0.001, start + 0.4);
+                    osc.start(start);
+                    osc.stop(start + 0.45);
+                });
+            } catch (e) { console.warn('Audio no disponible:', e); }
+        }
+
+        // ============================================================
         // ===== MODALES =====
         // ============================================================
         function openModal(id) {
+            // Reanudar audio context si está suspendido (política del navegador)
+            try { getAudioContext().resume(); } catch (e) {}
+
             document.getElementById('modal-' + id).classList.add('active');
             document.body.style.overflow = 'hidden';
 
@@ -1398,7 +1479,6 @@
             if (state.step === testQuestions.length - 1) {
                 state.completed = true;
                 renderTest(instance);
-                // Si terminamos el test en el panel de juegos, sugerir el siguiente juego
                 if (instance === 'juegos') {
                     setTimeout(() => {
                         if (confirm('🎉 ¡Test completado! ¿Quieres pasar al siguiente juego: Verdadero o Falso?')) {
@@ -1423,14 +1503,19 @@
         }
 
         // ============================================================
-        // ===== JUEGO: VERDADERO O FALSO =====
+        // ===== JUEGO: VERDADERO O FALSO (10 preguntas) =====
         // ============================================================
         const vfQuestions = [
             { q: "¿Es malo sentir miedo?", a: false, exp: "El miedo es una emoción natural y necesaria. No es malo sentirlo; lo importante es cómo lo gestionamos." },
             { q: "¿Hablar de tus emociones te hace débil?", a: false, exp: "Al contrario: expresar lo que sientes es un acto de valentía y fortalece tu salud mental." },
             { q: "¿La ansiedad se puede sentir en el cuerpo?", a: true, exp: "Sí. La ansiedad puede provocar taquicardia, sudor, tensión muscular y problemas para dormir." },
             { q: "¿Pedir ayuda profesional es señal de fracaso?", a: false, exp: "Pedir ayuda es un paso valiente. Los psicólogos son aliados, no jueces." },
-            { q: "¿El ejercicio físico ayuda a mejorar el ánimo?", a: true, exp: "Sí. El ejercicio libera endorfinas, conocidas como las hormonas de la felicidad." }
+            { q: "¿El ejercicio físico ayuda a mejorar el ánimo?", a: true, exp: "Sí. El ejercicio libera endorfinas, conocidas como las hormonas de la felicidad." },
+            { q: "¿Todas las emociones son válidas?", a: true, exp: "Sí. Todas las emociones cumplen una función y merecen ser escuchadas. No hay emociones 'buenas' o 'malas'." },
+            { q: "¿Llorar es señal de debilidad?", a: false, exp: "Llorar es una respuesta natural que ayuda a liberar tensión emocional. No es debilidad." },
+            { q: "¿Dormir bien afecta tu salud mental?", a: true, exp: "Sí. Dormir bien regula las emociones, mejora la memoria y reduce el estrés." },
+            { q: "¿La meditación puede ayudar a calmar la ansiedad?", a: true, exp: "Sí. La meditación y la respiración profunda reducen los síntomas de ansiedad." },
+            { q: "¿Es normal sentirse triste a veces?", a: true, exp: "Sí. La tristeza es una emoción normal y pasajera. Solo preocúpate si persiste más de dos semanas." }
         ];
 
         let vfIndex = 0;
@@ -1459,7 +1544,7 @@
 
             const q = vfQuestions[vfIndex];
             container.innerHTML = `
-                <div class="vf-question">
+                <div class="vf-question" id="vf-question-box">
                     <h3>${q.q}</h3>
                     <div class="vf-buttons">
                         <button class="vf-btn" onclick="answerVF(true, this)">✅ Verdadero</button>
@@ -1486,9 +1571,13 @@
                 vfScore++;
                 btn.classList.add('correct');
                 feedback.innerHTML = `✅ <span style="color: #27ae60;">¡Correcto!</span> ${q.exp}`;
+                playCorrectSound();
             } else {
                 btn.classList.add('wrong');
                 feedback.innerHTML = `❌ <span style="color: #e74c3c;">Incorrecto.</span> La respuesta correcta es <strong>${q.a ? 'Verdadero' : 'Falso'}</strong>. ${q.exp}`;
+                playWrongSound();
+                const box = document.getElementById('vf-question-box');
+                if (box) box.classList.add('shake');
             }
 
             buttons.forEach(b => b.disabled = true);
@@ -1497,7 +1586,7 @@
                 vfIndex++;
                 vfAnswered = false;
                 renderVF();
-            }, 2500);
+            }, 2600);
         }
 
         function resetVF() {
@@ -1548,7 +1637,6 @@
             const container = document.getElementById('frases-content');
             const phrase = phrases[phraseIndex];
 
-            // Construir texto con espacios
             let html = '';
             let blankIdx = 0;
             phrase.parts.forEach((part) => {
@@ -1578,11 +1666,8 @@
 
         function selectPhraseWord(word, btn) {
             const phrase = phrases[phraseIndex];
-            // Encontrar el primer blank vacío
             const emptyIdx = phraseState.findIndex(v => v === null);
             if (emptyIdx === -1) return;
-
-            // Verificar si la palabra ya fue usada
             if (phraseState.includes(word)) return;
 
             phraseState[emptyIdx] = word;
@@ -1590,7 +1675,6 @@
             btn.disabled = true;
             btn.style.opacity = '0.5';
 
-            // Si ya están todos los blanks llenos, verificar
             if (!phraseState.includes(null)) {
                 checkPhrase();
             }
@@ -1600,9 +1684,13 @@
             const phrase = phrases[phraseIndex];
             const allCorrect = phrase.blanks.every((b, i) => phraseState[i] === b);
 
-            if (allCorrect) phraseScore++;
+            if (allCorrect) {
+                phraseScore++;
+                playCorrectSound();
+            } else {
+                playWrongSound();
+            }
 
-            // Mostrar resultado brevemente y pasar a la siguiente
             setTimeout(() => {
                 if (allCorrect) {
                     alert('✅ ¡Correcto! 🎉');
@@ -1611,7 +1699,7 @@
                 }
                 phraseIndex++;
                 renderFrases();
-            }, 300);
+            }, 400);
         }
 
         function resetFrases() {
