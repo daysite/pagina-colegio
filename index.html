@@ -167,11 +167,14 @@
             border: 3px solid #d6eef8;
         }
 
-        .welcome-emoji {
-            font-size: 3.5rem;
-            margin-bottom: 10px;
+        .welcome-emoji-img {
+            width: 110px;
+            height: 110px;
+            object-fit: contain;
+            margin: 0 auto 12px;
+            display: block;
             animation: float 3s ease-in-out infinite;
-            display: inline-block;
+            filter: drop-shadow(0 6px 15px rgba(33, 147, 176, 0.3));
         }
 
         .welcome-title {
@@ -863,6 +866,7 @@
             .hero { padding: 40px 20px 70px; }
             .welcome-card { padding: 30px 20px 20px; margin: -50px auto 30px; }
             .welcome-title { font-size: 1.3rem; }
+            .welcome-emoji-img { width: 85px; height: 85px; }
             .menu-grid { grid-template-columns: repeat(2, 1fr); gap: 15px; padding: 0 15px; }
             .menu-btn { padding: 22px 12px; border-radius: 20px; }
             .menu-btn .icon { font-size: 2.3rem; }
@@ -893,7 +897,7 @@
     <!-- ===== TARJETA DE BIENVENIDA ===== -->
     <main>
         <div class="welcome-card">
-            <div class="welcome-emoji">💙</div>
+            <img class="welcome-emoji-img" src="https://kommodo.ai/i/hlSEi6gXuNmB05ThCgeJ" alt="Bienvenida">
             <h2 class="welcome-title">¡Bienvenidos Jóvenes!</h2>
             <p class="welcome-text">Explora nuestra página y descubre cómo podemos impulsarte</p>
         </div>
@@ -1547,14 +1551,6 @@
             // Construir texto con espacios
             let html = '';
             let blankIdx = 0;
-            phrase.parts.forEach((part, i) => {
-                html += part + ' ';
-                if (i < phrase.parts.length - 1 && part !== phrase.parts[phrase.parts.length - 1]) {
-                    // después de cada parte excepto la última, hay un blank si corresponde
-                }
-            });
-            // Reconstruir mejor: parts viene como ['Sentir', '___', 'te hace', '___']
-            html = '';
             phrase.parts.forEach((part) => {
                 if (part === '___') {
                     const val = phraseState[blankIdx] || '___';
@@ -1642,7 +1638,7 @@
         // ============================================================
         // ===== CHAT IA =====
         // ============================================================
-        const API_URL = 'https://api.delirius.store/ia/gemini?query=';
+        const API_URL = 'https://api.delirius.online/ia/gemini?query=';
         const IA_CONTEXT = `Eres un asistente experto en salud mental y bienestar emocional para adolescentes y jóvenes. 
         Tu misión es proporcionar información clara, empática y basada en evidencia sobre temas como ansiedad, depresión, 
         autoestima, relaciones, manejo del estrés, y cómo buscar ayuda. Siempre das respuestas breves, de máximo 3 párrafos, 
